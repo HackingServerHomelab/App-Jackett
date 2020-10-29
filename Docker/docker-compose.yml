@@ -1,0 +1,26 @@
+version: '3.7'
+services:
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    hostname: jackett
+    restart: unless-stopped
+    volumes:
+      - ../Data/config:/config
+      - ../Data/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - AUTO_UPDATE=true # optional
+      #- RUN_OPTS= # optional
+    labels:
+      # Traefik Labels
+      - "traefik.enable=true"
+      # HTTPS Labels
+      - "traefik.http.routers.jackett.rule=Host(`localhost`)" # Domain Name
+      - "traefik.http.routers.jackett.entrypoints=web-secure"
+      - "traefik.http.routers.jackett.middlewares=default-headers@file"
+      - "traefik.http.routers.jackett.service=jackett"
+      - "traefik.http.routers.jackett.tls=true"
+      - "traefik.http.services.jackett.loadbalancer.server.port=9117" # Proxied Port
